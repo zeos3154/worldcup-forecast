@@ -1,51 +1,50 @@
 # worldcup-forecast
 
-A structural + Bayesian forecaster for the FIFA World Cup — and, just as importantly, an
-**honest, rigorously-validated** account of *what actually improves* national-team match
-prediction.
+**简体中文** | [English](README-EN.md)
+
+一个面向 FIFA 世界杯的结构化 + 贝叶斯预测器；同样重要的是，它也提供了一份
+**诚实、经过严格验证**的说明：到底哪些方法真的能改进国家队比赛预测。
 
 ![python](https://img.shields.io/badge/python-3.10%2B-blue)
 ![license](https://img.shields.io/badge/license-MIT-green)
 ![tests](https://img.shields.io/badge/tests-passing-brightgreen)
 
-Most World Cup models publish a champion list and a flattering accuracy number. This one
-ships a **walk-forward validation harness** and a **findings ledger** that states — with
-significance tests — which ideas help and which don't, including the uncomfortable ones.
-The headline result is itself honest: after an exhaustive search, the model sits at the
-*structural efficiency frontier*, and the betting market is very hard to beat.
+大多数世界杯模型会发布一份冠军榜和一个看起来很漂亮的准确率数字。这个项目则提供了
+**滚动向前验证框架**和一份**发现台账**，用显著性检验说明哪些想法有效、哪些无效，
+包括那些不太令人舒服的结论。核心结论本身也保持诚实：经过穷尽式搜索后，模型已经位于
+*结构效率前沿*，而博彩市场非常难以击败。
 
 ---
 
-## What it does
+## 它能做什么
 
-- **Team strength** from a frozen pre-tournament FIFA snapshot + Transfermarkt squad value
-  + a leakage-safe Elo, wrapped in Klement-style structural priors (GDP, population,
-  climate, host advantage, football-culture).
-- **Match model**: a hierarchical Bayesian Poisson with partial pooling (PyMC) — data-rich
-  teams are pulled by results; data-poor teams shrink to the structural prior.
-- **Tournament**: Monte-Carlo simulation of the official 2026 bracket (12 groups, 8 best
-  third-placed teams, 73–104 knockout map) for champion/stage probabilities.
-- **Validation**: out-of-sample walk-forward scoring (log-loss / RPS / Brier) with
-  paired-bootstrap significance — never judged on a handful of matches.
-- **Market benchmark**: Polymarket and traditional bookmaker odds for comparison only.
-  Per the design's independence principle, **market data is never an input to the model**.
+- **球队强度**：基于冻结的赛前 FIFA 快照、Transfermarkt 阵容身价、无泄漏 Elo，
+  并用 Klement 风格的结构先验包裹起来（GDP、人口、气候、主场优势、足球文化）。
+- **比赛模型**：带部分池化的分层贝叶斯 Poisson 模型（PyMC）——数据丰富的球队更多由
+  比赛结果牵引，数据稀缺的球队则收缩到结构先验。
+- **赛事模拟**：对官方 2026 赛制进行 Monte-Carlo 模拟（12 个小组、8 个成绩最好的
+  小组第三、73-104 淘汰赛映射），输出冠军和阶段概率。
+- **验证**：样本外滚动向前评分（log-loss / RPS / Brier），并使用配对 bootstrap
+  显著性检验；从不只用少量比赛来判断模型。
+- **市场基准**：Polymarket 和传统博彩公司赔率仅用于比较。根据设计中的独立性原则，
+  **市场数据绝不会作为模型输入**。
 
-## Quickstart
+## 快速开始
 
 ```bash
 git clone <repo-url> && cd worldcup-forecast
-pip install -e .                 # or: make install
+pip install -e .                 # 或者：make install
 
-wcforecast forecast              # 2026 champion probabilities (dual-track)
+wcforecast forecast              # 2026 冠军概率（双轨）
 wcforecast predict Brazil Morocco
-wcforecast validate              # out-of-sample scorecard with significance tests
-ODDS_API_KEY=xxxx wcforecast odds   # live bookmaker consensus (optional, free key)
+wcforecast validate              # 带显著性检验的样本外评分表
+ODDS_API_KEY=xxxx wcforecast odds   # 实时博彩公司共识（可选，需要免费 key）
 ```
 
-Python ≥ 3.10. First run auto-downloads the public match/ranking datasets; the small
-frozen 2026 inputs are bundled in `data/snapshots/`.
+需要 Python >= 3.10。首次运行会自动下载公开比赛和排名数据集；小型的冻结 2026 输入
+已随项目放在 `data/snapshots/` 中。
 
-## Example output
+## 示例输出
 
 ```
 2026 World Cup — champion probability (Monte Carlo)
@@ -59,58 +58,59 @@ frozen 2026 inputs are bundled in `data/snapshots/`.
   ...
 ```
 
-Two tracks are reported side by side:
-- **accuracy** — the full model (FIFA + squad-value anchor + match data);
-- **independent** — the structural ("Klement") prior alone, market-free and interpretable.
+项目会并排报告两条轨道：
+- **accuracy**：完整模型（FIFA + 阵容身价锚点 + 比赛数据）；
+- **independent**：仅结构化（“Klement”）先验，不含市场数据，且可解释。
 
-Their differences are *features to explain*, not errors to hide.
+二者之间的差异是*需要解释的特征*，不是需要隐藏的错误。
 
-## Honest findings — the distinctive part
+## 诚实发现：这个项目最独特的部分
 
-Every candidate was tested out-of-sample on a **locked 305-match window (2024–2026)** with
-paired-bootstrap significance. Full ledger: [`docs/FINDINGS.md`](docs/FINDINGS.md).
+每个候选想法都在一个**锁定的 305 场比赛窗口（2024-2026）**上做过样本外测试，
+并使用配对 bootstrap 检验显著性。完整台账见：
+[`docs/FINDINGS.md`](docs/FINDINGS.md)。
 
-| Idea | Verdict |
+| 想法 | 结论 |
 |---|---|
-| Leakage-safe Elo (K=40) + structural prior | ✅ solid baseline |
-| Temperature calibration + neutral-draw boost | ✅ small but significant |
-| Model averaging (Bayesian + Elo-logit) | ✅ lowers variance |
-| Squad value as a strength anchor | ✅ helps 2026 forecast (aligns ~30% closer to the sharp market on mismatches) |
-| FIFA vs Elo anchor | ➖ tie (FIFA's value is data quality, not extra signal) |
-| Extra features (form, rest, confederation) | ➖ no significant gain |
-| Head-to-head records | ❌ ≈ zero once strength is controlled |
-| Dixon-Coles low-score correction | ❌ ρ ≈ 0 on this data |
-| Gradient-boosting (LightGBM) ensemble & isotonic calibration | ❌ over-fit sparse data, significantly worse |
+| 无泄漏 Elo（K=40）+ 结构先验 | ✅ 稳健基线 |
+| 温度校准 + 中立场平局提升 | ✅ 小幅但显著 |
+| 模型平均（Bayesian + Elo-logit） | ✅ 降低方差 |
+| 阵容身价作为强度锚点 | ✅ 有助于 2026 预测（在强弱悬殊比赛上，与敏锐市场的距离约缩小 30%） |
+| FIFA vs Elo 锚点 | ➖ 平手（FIFA 的价值在于数据质量，而不是额外信号） |
+| 额外特征（状态、休息、洲际足联） | ➖ 没有显著收益 |
+| 历史交手记录 | ❌ 控制强度后几乎为零 |
+| Dixon-Coles 低比分修正 | ❌ 在这份数据上 rho 约为 0 |
+| 梯度提升（LightGBM）集成与 isotonic 校准 | ❌ 对稀疏数据过拟合，显著更差 |
 
-**Bottom line:** simple/low-variance moves help; flexible/complex ones over-fit national-team
-data. The model is at the structural frontier — single-match World Cup outcomes are roughly
-half luck, and the market is hard to beat. That conclusion is the product.
+**一句话结论：** 简单、低方差的改动有帮助；灵活、复杂的方法容易在国家队数据上过拟合。
+模型已经到达结构前沿——单场世界杯比赛结果大约有一半来自运气，而市场很难击败。
+这个结论本身就是产品的一部分。
 
-## How it works
+## 工作原理
 
-See [`docs/DESIGN.md`](docs/DESIGN.md) for the full methodology and the design trade-offs
-(why partial pooling, why the market is benchmark-only, how leakage is prevented).
+完整方法论和设计取舍见 [`docs/DESIGN.md`](docs/DESIGN.md)
+（为什么使用部分池化、为什么市场只作为基准、如何避免数据泄漏）。
 
-## Project layout
+## 项目结构
 
 ```
 worldcup-forecast/
 ├── src/wcforecast/
-│   ├── teams.py        # the 48 teams, official draw, confederations
-│   ├── data.py         # leakage-safe loaders (martj42, FIFA, squad, World Bank)
-│   ├── ratings.py      # Elo + structural (Klement) prior index
-│   ├── model.py        # hierarchical Bayesian Poisson (PyMC)
-│   ├── predict.py      # score-grid 1X2 + calibration
-│   ├── simulate.py     # official bracket + Monte-Carlo champion odds
-│   ├── validate.py     # walk-forward OOS harness + metrics + significance
-│   ├── markets.py      # Polymarket + bookmaker odds (benchmark only)
-│   └── cli.py          # `wcforecast` command-line interface
-├── tests/              # fast, offline unit tests
-├── docs/               # DESIGN.md (methodology) + FINDINGS.md (validated ledger)
-└── data/               # frozen 2026 snapshots (committed) + caches (git-ignored)
+│   ├── teams.py        # 48 支球队、官方抽签、洲际足联
+│   ├── data.py         # 无泄漏加载器（martj42、FIFA、阵容、World Bank）
+│   ├── ratings.py      # Elo + 结构化（Klement）先验指数
+│   ├── model.py        # 分层贝叶斯 Poisson（PyMC）
+│   ├── predict.py      # 比分网格 1X2 + 校准
+│   ├── simulate.py     # 官方赛程结构 + Monte Carlo 冠军赔率
+│   ├── validate.py     # 滚动向前样本外框架 + 指标 + 显著性
+│   ├── markets.py      # Polymarket + 博彩公司赔率（仅作基准）
+│   └── cli.py          # `wcforecast` 命令行接口
+├── tests/              # 快速、离线的单元测试
+├── docs/               # DESIGN.md（方法论）+ FINDINGS.md（已验证台账）
+└── data/               # 冻结的 2026 快照（已提交）+ 缓存（git 忽略）
 ```
 
-## Library use
+## 作为库使用
 
 ```python
 from wcforecast import data, ratings, model, simulate, predict
@@ -127,26 +127,25 @@ simulate.champion_probabilities(m, s, n_sims=20000).head()
 predict.calibrate(m.match_probs("Brazil", "Morocco", home_advantage=0.0))
 ```
 
-## Design principle: independence from the market
+## 设计原则：独立于市场
 
-The model never ingests betting odds (as a feature, calibration target, or ensemble member).
-Its purpose is an *independent, interpretable structural signal*; markets are used only to
-benchmark it. Beating the market is **not** the goal — and the validation confirms it would
-be very hard anyway.
+模型从不读取博彩赔率（无论是作为特征、校准目标，还是集成成员）。它的目的在于提供一个
+*独立、可解释的结构化信号*；市场只用于基准比较。击败市场**不是**目标——验证结果也确认，
+这件事本来就非常困难。
 
-## Limitations
+## 局限
 
-- Single-match prediction has a low ceiling (much of the outcome is luck); see FINDINGS.
-- Squad values and the FIFA snapshot are single 2026 snapshots — used for the forward
-  forecast, not historical backtests (no history available).
-- Free bookmaker-odds tier covers live odds only, so the market benchmark for *historical*
-  validation is limited to outcomes, not historical prices.
+- 单场比赛预测的上限较低（很多结果来自运气）；详见 FINDINGS。
+- 阵容身价和 FIFA 快照都是单一的 2026 快照——用于向前预测，而不是历史回测
+  （因为没有可用历史）。
+- 免费博彩公司赔率层级只覆盖实时赔率，因此用于*历史*验证的市场基准只能比较结果，
+  不能比较历史价格。
 
-## License
+## 许可证
 
-MIT — see [`LICENSE`](LICENSE).
+MIT — 见 [`LICENSE`](LICENSE)。
 
-## Acknowledgements
+## 致谢
 
-Inspired by Joachim Klement's structural World Cup model. Data: martj42/international_results,
-Dato-Futbol/fifa-ranking, FIFA, Transfermarkt, World Bank, Polymarket, The Odds API.
+受 Joachim Klement 的结构化世界杯模型启发。数据来源：martj42/international_results、
+Dato-Futbol/fifa-ranking、FIFA、Transfermarkt、World Bank、Polymarket、The Odds API。
