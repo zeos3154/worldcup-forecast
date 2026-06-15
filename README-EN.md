@@ -38,11 +38,16 @@ at the actual result's odds.
 | Brazil–Morocco | 42/31/28 | 4100/3100/2800 | draw | 3.92 | +2,152 |
 | Haiti–Scotland | 19/30/51 | 1900/3000/5100 | away | 1.55 | −2,095 |
 | Australia–Turkey | 26/31/43 | 2600/3100/4300 | home | 5.71 | +4,846 |
-| **Total (8 matches, $80,000 staked)** | | | | | **+18,639** |
+| Germany–Curaçao | 78/16/5 | 7900/1600/500 | home | 1.06 | −1,626 |
+| Ivory Coast–Ecuador | 30/32/37 | 3000/3200/3800 | home | 3.79 | +1,370 |
+| Netherlands–Japan | 42/30/27 | 4300/3000/2700 | draw | 3.64 | +920 |
+| Sweden–Tunisia | 45/31/23 | 4600/3100/2300 | home | 1.97 | −938 |
+| Spain–Cape Verde | 78/17/6 | 7700/1700/600 | draw | 19.42 | +23,009 |
+| **Total (13 matches, $130,000 staked)** | | | | | **+41,374** |
 
-> ⚠️ Only 8 matches for now, and the return is dominated by a single longshot
-> (Qatar–Switzerland draw @8.00, +$10,800, ~60% of the total); against the ~5.9% bookmaker vig
-> the strategy is negative-EV overall. 
+> ⚠️ 13 matches so far, with the return dominated by two longshot draws (Spain–Cape Verde
+> @19.42, +$23,009; Qatar–Switzerland @8.00, +$10,800) — together ~80% of the total; against
+> the ~5.9% bookmaker vig the strategy is negative-EV overall.
 
 ## What it does
 
