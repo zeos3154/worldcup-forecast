@@ -18,3 +18,9 @@ data/raw/
 
 # Secrets
 .env
+
+# Local notes (personal predictions, scratchpad)
+will/
+
+# Claude Code local settings
+.claude/
