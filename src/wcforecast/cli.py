@@ -2,12 +2,27 @@
 from __future__ import annotations
 
 import argparse
+import os
+from pathlib import Path
 
 
 from . import data, markets, predict
 from . import model as model_mod
 from . import ratings, simulate
 from .teams import HOSTS, INDEX
+
+
+def _load_dotenv() -> None:
+    """Load project-root ``.env`` into ``os.environ`` (existing vars win)."""
+    env_path = Path(__file__).resolve().parents[2] / ".env"
+    if not env_path.exists():
+        return
+    for line in env_path.read_text(encoding="utf-8").splitlines():
+        line = line.strip().removeprefix("export ").strip()
+        if not line or line.startswith("#") or "=" not in line:
+            continue
+        k, v = line.split("=", 1)
+        os.environ.setdefault(k.strip(), v.strip().strip('"').strip("'"))
 
 CUTOFF_2026 = "2026-06-11"
 CACHE_MODEL = data.CACHE / "model_2026.pkl"
@@ -86,6 +101,7 @@ def cmd_odds(args):
 
 
 def main(argv=None):
+    _load_dotenv()
     ap = argparse.ArgumentParser(prog="wcforecast",
                                  description="Structural + Bayesian World Cup forecaster.")
     sub = ap.add_subparsers(dest="cmd", required=True)
